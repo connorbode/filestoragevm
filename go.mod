@@ -1,4 +1,4 @@
-module github.com/ava-labs/timestampvm
+module github.com/connorbode/filestoragevm
 
 go 1.15
 
