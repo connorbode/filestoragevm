@@ -27,7 +27,7 @@ import (
 const (
 	dataLen      = 32
 	codecVersion = 0
-	Name         = "timestampvm"
+	Name         = "filestoragevm"
 )
 
 var (
