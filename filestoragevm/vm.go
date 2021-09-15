@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	dataLen = 1024
+	dataLen = 4096
 	codecVersion = 0
 	Name         = "filestoragevm"
 )
