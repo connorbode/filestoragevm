@@ -75,6 +75,7 @@ func (b *Block) getFaucetRecipient() string {
 	return string(b.Data[174:174 + 50])
 }
 
+
 // convenience method to take a block of bytes
 // and pull an integer out of them
 func (b *Block) convertBytesToInt(bytes []byte) int64 {
@@ -101,6 +102,15 @@ func (b *Block) getUnallocatedBalance() int64 {
 	return balance
 }
 
+func (b *Block) getUploadSender() string {
+	pubkeyBytes := b.Data[0:50]
+	return string(pubkeyBytes)
+}
+
+func (b *Block) getCostPerUploadBlock() int64 {
+	return 1
+}
+
 func (b *Block) getBalance(account string) int64 {
 	var balance int64
 	if b.Parent().String() == "11111111111111111111111111111111LpoYY" {
@@ -119,6 +129,8 @@ func (b *Block) getBalance(account string) int64 {
 		if b.getTransferRecipient() == account {
 			balance += b.getTransferAmount()
 		}
+	} else if b.isUploadBlock() && b.getUploadSender() == account {
+		balance -= b.getCostPerUploadBlock()
 	}
 	return balance
 }
@@ -184,7 +196,9 @@ func (b *Block) Verify() error {
 
 	// validate different types of blocks
 	if b.isUploadBlock() {
-		// upload fauc
+		if b.getBalance(b.getUploadSender()) < b.getCostPerUploadBlock() {
+			return errInsufficientBalance
+		}
 	} else if b.isFaucetBlock() {
 		// faucet, only error is if faucet is empty
 		if b.getFaucetAmount() > b.getUnallocatedBalance() {
