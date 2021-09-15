@@ -147,12 +147,19 @@ type GetStorageCostArgs struct {
 }
 
 type GetStorageCostReply struct {
-	Cost string `json:"cost"`
+	Cost int64 `json:"cost"`
 }
 
 func (s *Service) GetStorageCost(_ *http.Request, args *GetStorageCostArgs, reply *GetStorageCostReply) error {
 	var err error
-	reply.Cost = "0" // TODO
+	id, err := s.vm.State.GetLastAccepted(s.vm.DB)
+	blockInterface, err := s.vm.GetBlock(id)
+	if err != nil {
+		return errNoSuchBlock
+	}
+
+	block, _ := blockInterface.(*Block)
+	reply.Cost = block.getCostPerUploadBlock()
 	return err
 }
 
@@ -186,6 +193,74 @@ func (s *Service) GetBalance(_ *http.Request, args *GetBalanceArgs, reply *GetBa
 	coreBlock, _ := s.vm.GetBlock(id)
 	block, _ := coreBlock.(*Block)
 	reply.Balance = block.getBalance(args.Account)
+	return err
+}
+
+type GetValidatorsAtArgs struct {
+	Timestamp int64
+	NodeID string
+}
+
+type GetValidatorsAtReply struct {
+	Validators map[string]uint64 `json:"validators"`
+	Height uint64 `json:"height"`
+	WasValidating bool `json:"wasValidating"`
+}
+
+func (s *Service) GetValidatorsAt(_ *http.Request, args *GetValidatorsAtArgs, reply *GetValidatorsAtReply) error {
+	var err error
+
+	/*
+	// get node host? it must be possible
+	uri := "http://localhost:9658"
+	// get subnet ID, uhoh another thing!!! FK
+	subnetID, _ := ids.FromString("2PYeJUhPiTrhe6Yq73okTzayR15U5WUD2R2idfsCLfqahEi5uo")
+	timeout := 10 * time.Second
+	// 1. instantiate p-chain api
+	pChain := platformvm.NewClient(uri, timeout)
+	// 2. get height on p-chain api
+	height, _ := pChain.GetHeight()
+	// 3. instantiate p-chain indexer api
+
+	pChainIndex := indexer.NewClient(uri, "/ext/index/P/block", timeout)
+	// 4. start at p-chain top index
+
+	for true {
+		res, _ := pChainIndex.GetContainerByIndex(&indexer.GetContainer{
+			Index: json.Uint64(height - 1),
+			Encoding: formatting.CB58,
+		})
+		if res.Timestamp.Unix() < args.Timestamp {
+			break
+		}
+		height -= 1
+		if height < 0 {
+			// we have a problem, how to raise an error?
+		}
+	}
+	// 5. find the p-chain index that is just before our timestamp
+	// 6. use the p-chain api to get the validators active at that timestamp
+	// this one isn't implemented in the client
+	getValidatorsAtReply := &platformvm.GetValidatorsAtReply{}
+	pChainRequester := rpc.NewEndpointRequester(uri, "/ext/P", "platform", timeout)
+	pChainRequester.SendRequest("getValidatorsAt", &platformvm.GetValidatorsAtArgs{
+		Height: json.Uint64(height),
+		SubnetID: subnetID,
+	}, getValidatorsAtReply)
+	wasValidating := false
+	for k := range getValidatorsAtReply.Validators {
+		if k == args.NodeID {
+			wasValidating = true
+		}
+	}
+	*/
+
+	/*
+	reply.Validators = getValidatorsAtReply.Validators
+	reply.Height = height
+	reply.WasValidating = wasValidating
+	*/
+	reply.WasValidating = wasNodeValidatingAtTime(args.NodeID, args.Timestamp)
 	return err
 }
 
