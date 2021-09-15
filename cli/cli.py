@@ -342,41 +342,27 @@ class FilestorageAPI(API):
 			'timestamp': timestamp,
 			'nodeID': node_id,
 		})
+
 	
 api = FilestorageAPI('http://localhost:9658', sys.argv[1])
-api.create_account(True)
-other = api.create_account()
-import ipdb; ipdb.set_trace()
-print(api.get_balance())
-#print(api.get_unallocated_balance())
-print(api.faucet('4000'))
-print('we got 4000 from the faucet, should have a balance of 4000')
-print(api.get_balance())
-stake_start = int(time.time() + 20)
-stake_end = int(time.time() + 20 + 20)
-print(stake_start)
-print(stake_end)
-print(f'stake period length: {stake_end - stake_start}')
-node_id = 'NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5'
-print(api.stake(node_id, '2000', stake_start, stake_end))
-print('staking transaction is sent, we should only have 2000 available now')
-print(api.get_balance())
-time.sleep(20)
-print('we should be staking now, still should have 2000 available')
-print(api.get_balance())
-time.sleep(20)
-print('we should be done staking and have the reward now + unlocked balance')
-print(api.get_balance())
-#print(api.faucet('1999999999999980'))
-#print(api.get_unallocated_balance())
-#print(api.unpack_block(api.get_block('FZjzuxBNWiCuh91f8CCTwL3hc9bhU9krK1oMSFWTRBECjkmSv')['data']))
-"""
-block_ids = api.upload_data('test')
-print(api.download_data(block_ids))
-"""
+print("""
 
-"""
-block_ids = api.upload_file('./test.png')
-print(block_ids)
-print(api.download_file(block_ids, './test-out.png'))
-"""
+  ______ _____ _      ______  _____ _______ ____  _____            _____ ________      ____  __ 
+ |  ____|_   _| |    |  ____|/ ____|__   __/ __ \|  __ \     /\   / ____|  ____\ \    / /  \/  |
+ | |__    | | | |    | |__  | (___    | | | |  | | |__) |   /  \ | |  __| |__   \ \  / /| \  / |
+ |  __|   | | | |    |  __|  \___ \   | | | |  | |  _  /   / /\ \| | |_ |  __|   \ \/ / | |\/| |
+ | |     _| |_| |____| |____ ____) |  | | | |__| | | \ \  / ____ \ |__| | |____   \  /  | |  | |
+ |_|    |_____|______|______|_____/   |_|  \____/|_|  \_\/_/    \_\_____|______|   \/   |_|  |_|
+                                                                                                
+
+				Welcome ! 
+
+				You now have access to the api via the `api` variable.
+
+				For docs, check out:
+					https://github.com/connorbode/filestoragevm/blob/main/cli/README.md
+
+
+""")
+
+import ipdb; ipdb.set_trace()

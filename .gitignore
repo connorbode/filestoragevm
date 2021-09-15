@@ -51,3 +51,5 @@ avalanchego*
 /avash/
 node_modules
 env.sh
+*.swo
+*.swp
