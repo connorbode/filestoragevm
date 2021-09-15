@@ -173,16 +173,19 @@ func (s *Service) GetUnallocatedFunds(_ *http.Request, args *GetUnallocatedFunds
 }
 
 type GetBalanceArgs struct {
-	PublicKey string
+	Account string
 }
 
 type GetBalanceReply struct {
-	Balance string `json:"balance"`
+	Balance int64 `json:"balance"`
 }
 
 func (s *Service) GetBalance(_ *http.Request, args *GetBalanceArgs, reply *GetBalanceReply) error {
 	var err error
-	reply.Balance = "0" // TODO
+	id, _ := s.vm.State.GetLastAccepted(s.vm.DB)
+	coreBlock, _ := s.vm.GetBlock(id)
+	block, _ := coreBlock.(*Block)
+	reply.Balance = block.getBalance(args.Account)
 	return err
 }
 

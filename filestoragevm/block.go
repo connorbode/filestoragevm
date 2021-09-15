@@ -52,6 +52,10 @@ func (b *Block) getFaucetAmount() int64 {
 	return b.convertBytesToInt(faucetAmountBytes)
 }
 
+func (b *Block) getFaucetRecipient() string {
+	return string(b.Data[174:174 + 50])
+}
+
 // convenience method to take a block of bytes
 // and pull an integer out of them
 func (b *Block) convertBytesToInt(bytes []byte) int64 {
@@ -60,6 +64,9 @@ func (b *Block) convertBytesToInt(bytes []byte) int64 {
         return int64(num)
 }
 
+
+// returns the unallocated balance from the original funds on the blockchain
+// these get allocated via faucet or by validators earning rewards
 func (b *Block) getUnallocatedBalance() int64 {
 	var balance int64
 	if b.Parent().String() == "11111111111111111111111111111111LpoYY" {
@@ -68,10 +75,24 @@ func (b *Block) getUnallocatedBalance() int64 {
 		parentBlock, _ := b.VM.GetBlock(b.Parent())
 		parent, _ := parentBlock.(*Block)
 		balance = parent.getUnallocatedBalance()
-
 	}
 	if b.isFaucetBlock() {
 		balance -= b.getFaucetAmount()
+	}
+	return balance
+}
+
+func (b *Block) getBalance(account string) int64 {
+	var balance int64
+	if b.Parent().String() == "11111111111111111111111111111111LpoYY" {
+		balance = 0
+	} else {
+		parentBlock, _ := b.VM.GetBlock(b.Parent())
+		parent, _ := parentBlock.(*Block)
+		balance = parent.getBalance(account)
+	}
+	if b.isFaucetBlock() && b.getFaucetRecipient() == account {
+		balance += b.getFaucetAmount()
 	}
 	return balance
 }
