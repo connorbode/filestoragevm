@@ -21,6 +21,7 @@ var (
 	errTimestampTooLate  = errors.New("block's timestamp is more than 1 hour ahead of local time")
 	errBlockType         = errors.New("unexpected block type")
 	errInvalidSignature  = errors.New("invalid signature")
+	errFaucetEmpty       = errors.New("faucet is out of funds sorry bud")
 
 	_ snowman.Block = &Block{}
 )
@@ -158,10 +159,12 @@ func (b *Block) Verify() error {
 
 	// validate different types of blocks
 	if b.isUploadBlock() {
-		// upload
-
+		// upload fauc
 	} else if b.isFaucetBlock() {
-		// faucet
+		// faucet, only error is if faucet is empty
+		if b.getFaucetAmount() > b.getUnallocatedBalance() {
+			return errFaucetEmpty
+		}
 	}
 
 	// Our block inherits VM from *core.Block.
