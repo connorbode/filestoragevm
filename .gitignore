@@ -49,3 +49,4 @@ build/
 
 avalanchego*
 /avash/
+node_modules
