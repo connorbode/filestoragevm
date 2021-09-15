@@ -34,6 +34,48 @@ type Block struct {
 	Data        [dataLen]byte `serialize:"true"`
 }
 
+func (b *Block) getBlockType() string {
+	blockTypeBytes := b.Data[153]
+	return string(blockTypeBytes)
+}
+
+func (b *Block) isUploadBlock() bool {
+	return b.getBlockType() == "0"
+}
+
+func (b *Block) isFaucetBlock() bool {
+	return b.getBlockType() == "9"
+}
+
+func (b *Block) getFaucetAmount() int64 {
+	faucetAmountBytes := b.Data[158:158 + 16]
+	return b.convertBytesToInt(faucetAmountBytes)
+}
+
+// convenience method to take a block of bytes
+// and pull an integer out of them
+func (b *Block) convertBytesToInt(bytes []byte) int64 {
+	str := string(bytes)
+	num, _ := strconv.ParseUint(str, 10, 64)
+        return int64(num)
+}
+
+func (b *Block) getUnallocatedBalance() int64 {
+	var balance int64
+	if b.Parent().String() == "11111111111111111111111111111111LpoYY" {
+		balance = 5000000000000000
+	} else {
+		parentBlock, _ := b.VM.GetBlock(b.Parent())
+		parent, _ := parentBlock.(*Block)
+		balance = parent.getUnallocatedBalance()
+
+	}
+	if b.isFaucetBlock() {
+		balance -= b.getFaucetAmount()
+	}
+	return balance
+}
+
 // Verify returns nil iff this block is valid.
 // To be valid, it must be that:
 // b.parent.Timestamp < b.Timestamp <= [local time] + 1 hour
@@ -81,7 +123,6 @@ func (b *Block) Verify() error {
 	sigStr := string(sigBytes)
 	sigDecoded, _ := formatting.Decode(formatting.CB58, sigStr)
 	dataBytes := b.Data[153:]
-	//blockTypeBytes := dataBytes[0]
 	/*
 	blockLenBytes := dataBytes[1:5]
 	blockLenStr := string(blockLenBytes)
@@ -90,9 +131,16 @@ func (b *Block) Verify() error {
 	*/
 	//messageBytes := dataBytes[:5 + blockLen]
 	messageBytes := dataBytes
-
 	if pubkey.Verify(messageBytes, sigDecoded) == false {
 		return errInvalidSignature
+	}
+
+	// validate different types of blocks
+	if b.isUploadBlock() {
+		// upload
+
+	} else if b.isFaucetBlock() {
+		// faucet
 	}
 
 	// Our block inherits VM from *core.Block.

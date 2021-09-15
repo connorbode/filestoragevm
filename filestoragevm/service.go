@@ -156,6 +156,22 @@ func (s *Service) GetStorageCost(_ *http.Request, args *GetStorageCostArgs, repl
 	return err
 }
 
+type GetUnallocatedFundsArgs struct {
+}
+
+type GetUnallocatedFundsReply struct {
+	UnallocatedFunds int64 `json:"unallocatedFunds"`
+}
+
+func (s *Service) GetUnallocatedFunds(_ *http.Request, args *GetUnallocatedFundsArgs, reply *GetUnallocatedFundsReply) error {
+	var err error
+	id, _ := s.vm.State.GetLastAccepted(s.vm.DB)
+	coreBlock, _ := s.vm.GetBlock(id)
+	block, _ := coreBlock.(*Block)
+	reply.UnallocatedFunds = block.getUnallocatedBalance()
+	return err
+}
+
 type GetBalanceArgs struct {
 	PublicKey string
 }
