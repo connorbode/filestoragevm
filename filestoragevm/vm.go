@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	dataLen      = 32
+	dataLen = 1024
 	codecVersion = 0
 	Name         = "filestoragevm"
 )
@@ -48,6 +48,9 @@ type VM struct {
 
 	// Proposed pieces of data that haven't been put into a block and proposed yet
 	mempool [][dataLen]byte
+
+	// just testing
+	lastBlockHeight uint64
 }
 
 // Initialize this vm
