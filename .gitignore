@@ -50,3 +50,4 @@ build/
 avalanchego*
 /avash/
 node_modules
+env.sh

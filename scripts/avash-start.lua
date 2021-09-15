@@ -10,9 +10,9 @@ for key, cmd in ipairs(cmds) do
     avash_call(cmd)
 end
 
-scripts_dir = '/home/connor/Workspaces/avax-vm/scripts'
+scripts_dir = os.getenv('FILESTORAGEVM_DIR') .. '/scripts'
 tmp_file = scripts_dir .. '/tmp'
-run_python = 'python3 ' .. scripts_dir .. '/run.py'
+run_python = 'python3 ' .. scripts_dir .. '/avash-start-helper.py'
 os.execute(run_python .. ' 1')
 
 subnet_id = nil

@@ -4,7 +4,6 @@ import math
 import time
 import secrets
 import base64
-import secp256k1 as secp
 import cb58ref
 import hashlib
 import json

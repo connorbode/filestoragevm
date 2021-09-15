@@ -19,12 +19,13 @@ from time import sleep, time
 #
 #
 
-AVALANCHEGO = '/home/connor/Workspaces/avax-vm/avalanchego-v1.5.3/avalanchego'
+AVALANCHEGO = os.environ.get('AVALANCHEGO_DIR') + '/avalanchego'
 SCRIPTS_DIR = pathlib.Path(__file__).parent.resolve()
 USERNAME = 'username'
 PASSWORD = 'unaware-module-enunciate'
 WHALE_PRIVATE_KEY = 'PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN'
 VM_ID = 'qAyzuhzkcQQsAYQP3iibkD28DqXTS8cRsFC8PR3LuqebWVS2Q'
+TMPFILE = f'{SCRIPTS_DIR}/tmp'
 
 class RPC:
 	def __init__(self, url):
@@ -153,8 +154,7 @@ def step_one():
 		sleep(1)
 	subnet_id = list(diff)[0]
 
-	tmp = f'{SCRIPTS_DIR}/tmp'
-	with open(tmp, 'w') as f:
+	with open(TMPFILE, 'w') as f:
 		f.write(subnet_id)
 	
 	print('adding subnet validator')
@@ -172,6 +172,7 @@ def step_one():
 	rpc.wait_for_tx_commit(add_validator['result']['txID'])
 
 def step_two():
+	if os.path.exists(TMPFILE): os.remove(TMPFILE)
 	sleep(5)
 	wait_for_bootstrap()
 	""" submit the node for validation """
