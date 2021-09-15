@@ -6,9 +6,12 @@ package filestoragevm
 import (
 	"errors"
 	"time"
+	"strconv"
 
 	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
 	"github.com/ava-labs/avalanchego/vms/components/core"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	//"github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 var (
@@ -17,6 +20,7 @@ var (
 	errDatabaseSave      = errors.New("error while saving block to the database")
 	errTimestampTooLate  = errors.New("block's timestamp is more than 1 hour ahead of local time")
 	errBlockType         = errors.New("unexpected block type")
+	errInvalidSignature  = errors.New("invalid signature")
 
 	_ snowman.Block = &Block{}
 )
@@ -62,6 +66,26 @@ func (b *Block) Verify() error {
 	// ahead of this node's time
 	if b.Timestamp().Unix()>= time.Now().Add(time.Hour).Unix() {
 		return errTimestampTooLate
+	}
+
+	// check signatures on the block
+	factory := crypto.FactorySECP256K1R{}
+	pubkeyBytes := b.Data[0:50]
+	pubkey, _ := factory.ToPublicKey(pubkeyBytes)
+	sigLenBytes := b.Data[50:53]
+	sigLenStr := string(sigLenBytes)
+        sigLenNum, _ := strconv.ParseUint(sigLenStr, 10, 32)
+        sigLen := int(sigLenNum)
+	sigBytes := b.Data[53:53 + sigLen]
+	dataBytes := b.Data[153:]
+	//blockTypeBytes := dataBytes[0]
+	//blockLenBytes := dataBytes[1:5]
+	//blockLenStr := string(blockLenBytes)
+	//blockLenNum, _ := strconv.ParseUint(blockLenStr, 10, 32)
+	//blockLen := int(blockLenNum)
+	//blockDataBytes := dataBytes[5:5 + blockLen]
+	if pubkey.Verify(dataBytes, sigBytes) == false {
+		return errInvalidSignature
 	}
 
 	// Our block inherits VM from *core.Block.

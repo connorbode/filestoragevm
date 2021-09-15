@@ -6,6 +6,7 @@ package filestoragevm
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"net/http"
 
 	"github.com/ava-labs/avalanchego/ids"
@@ -168,3 +169,51 @@ func (s *Service) GetBalance(_ *http.Request, args *GetBalanceArgs, reply *GetBa
 	reply.Balance = "0" // TODO
 	return err
 }
+
+type DebugPayloadArgs struct {
+	Payload string
+}
+
+type DebugPayloadReply struct {
+	SigValid bool `json:"sigValid"`
+	Sig string `json:"sig"`
+	Message string `json:"message"`
+	MessageLength int `json:"messageLength"`
+	Pubkey string `json:"pubkey"`
+}
+
+func (s *Service) DebugPayload(_ *http.Request, args *DebugPayloadArgs, reply *DebugPayloadReply) error {
+	var err error
+	data, err := formatting.Decode(formatting.CB58, args.Payload)
+	factory := crypto.FactorySECP256K1R{}
+	pubkeyBytes := data[0:50]
+	pubkeyDecoded, _ := formatting.Decode(formatting.CB58, string(pubkeyBytes))
+	pubkey, _ := factory.ToPublicKey(pubkeyDecoded)
+	pubkeyStr, _ := formatting.EncodeWithChecksum(formatting.CB58, pubkey.Bytes())
+	reply.Pubkey = pubkeyStr
+	sigLenBytes := data[50:53]
+	sigLenStr := string(sigLenBytes)
+        sigLenNum, _ := strconv.ParseUint(sigLenStr, 10, 32)
+        sigLen := int(sigLenNum)
+	sigBytes := data[53:53 + sigLen]
+	sigStr := string(sigBytes)
+	sigDecoded, _ := formatting.Decode(formatting.CB58, sigStr)
+	reply.Sig = sigStr
+	dataBytes := data[153:]
+	//blockTypeBytes := dataBytes[0]
+	/*
+	blockLenBytes := dataBytes[1:5]
+	blockLenStr := string(blockLenBytes)
+	blockLenNum, _ := strconv.ParseUint(blockLenStr, 10, 32)
+	blockLen := int(blockLenNum)
+	*/
+	//messageBytes := dataBytes[:5 + blockLen]
+	messageBytes := dataBytes
+	reply.MessageLength = len(messageBytes)
+	messageStr := string(messageBytes)
+	reply.Message = messageStr
+	reply.SigValid = pubkey.Verify(messageBytes, sigDecoded)
+	return err
+}
+
+
