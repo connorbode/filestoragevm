@@ -22,6 +22,7 @@ var (
 	errBlockType         = errors.New("unexpected block type")
 	errInvalidSignature  = errors.New("invalid signature")
 	errFaucetEmpty       = errors.New("faucet is out of funds sorry bud")
+	errInsufficientBalance = errors.New("insufficient balance for transfer")
 
 	_ snowman.Block = &Block{}
 )
@@ -48,9 +49,26 @@ func (b *Block) isFaucetBlock() bool {
 	return b.getBlockType() == "9"
 }
 
+func (b *Block) isTransferBlock() bool {
+	return b.getBlockType() == "1"
+}
+
+func (b *Block) getTransferAmount() int64 {
+	amountBytes := b.Data[158:158 + 16]
+	return b.convertBytesToInt(amountBytes)
+}
+
+func (b *Block) getTransferSender() string {
+	return string(b.Data[174:174 + 50])
+}
+
+func (b *Block) getTransferRecipient() string {
+	return string(b.Data[174 + 50:174 + 50 + 50])
+}
+
 func (b *Block) getFaucetAmount() int64 {
-	faucetAmountBytes := b.Data[158:158 + 16]
-	return b.convertBytesToInt(faucetAmountBytes)
+	amountBytes := b.Data[158:158 + 16]
+	return b.convertBytesToInt(amountBytes)
 }
 
 func (b *Block) getFaucetRecipient() string {
@@ -94,6 +112,13 @@ func (b *Block) getBalance(account string) int64 {
 	}
 	if b.isFaucetBlock() && b.getFaucetRecipient() == account {
 		balance += b.getFaucetAmount()
+	} else if b.isTransferBlock() {
+		if b.getTransferSender() == account {
+			balance -= b.getTransferAmount()
+		}
+		if b.getTransferRecipient() == account {
+			balance += b.getTransferAmount()
+		}
 	}
 	return balance
 }
@@ -164,6 +189,10 @@ func (b *Block) Verify() error {
 		// faucet, only error is if faucet is empty
 		if b.getFaucetAmount() > b.getUnallocatedBalance() {
 			return errFaucetEmpty
+		}
+	} else if b.isTransferBlock() {
+		if b.getTransferAmount() > b.getBalance(b.getTransferSender()) {
+			return errInsufficientBalance
 		}
 	}
 
