@@ -46,3 +46,6 @@ db*
 
 bin/
 build/
+
+avalanchego*
+/avash/
