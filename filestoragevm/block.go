@@ -11,7 +11,7 @@ import (
 	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
 	"github.com/ava-labs/avalanchego/vms/components/core"
 	"github.com/ava-labs/avalanchego/utils/crypto"
-	//"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 var (
@@ -71,20 +71,27 @@ func (b *Block) Verify() error {
 	// check signatures on the block
 	factory := crypto.FactorySECP256K1R{}
 	pubkeyBytes := b.Data[0:50]
-	pubkey, _ := factory.ToPublicKey(pubkeyBytes)
+	pubkeyDecoded, _ := formatting.Decode(formatting.CB58, string(pubkeyBytes))
+	pubkey, _ := factory.ToPublicKey(pubkeyDecoded)
 	sigLenBytes := b.Data[50:53]
 	sigLenStr := string(sigLenBytes)
         sigLenNum, _ := strconv.ParseUint(sigLenStr, 10, 32)
         sigLen := int(sigLenNum)
 	sigBytes := b.Data[53:53 + sigLen]
+	sigStr := string(sigBytes)
+	sigDecoded, _ := formatting.Decode(formatting.CB58, sigStr)
 	dataBytes := b.Data[153:]
 	//blockTypeBytes := dataBytes[0]
-	//blockLenBytes := dataBytes[1:5]
-	//blockLenStr := string(blockLenBytes)
-	//blockLenNum, _ := strconv.ParseUint(blockLenStr, 10, 32)
-	//blockLen := int(blockLenNum)
-	//blockDataBytes := dataBytes[5:5 + blockLen]
-	if pubkey.Verify(dataBytes, sigBytes) == false {
+	/*
+	blockLenBytes := dataBytes[1:5]
+	blockLenStr := string(blockLenBytes)
+	blockLenNum, _ := strconv.ParseUint(blockLenStr, 10, 32)
+	blockLen := int(blockLenNum)
+	*/
+	//messageBytes := dataBytes[:5 + blockLen]
+	messageBytes := dataBytes
+
+	if pubkey.Verify(messageBytes, sigDecoded) == false {
 		return errInvalidSignature
 	}
 
