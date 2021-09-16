@@ -55,3 +55,6 @@ The following environment variables need to be set
 ### Running the CLI
 
 From the `/cli` directory, run `python3 cli.py <blockchain_id>`
+
+[More details on the CLI are available here](https://github.com/connorbode/filestoragevm/blob/main/cli/README.md)
+
