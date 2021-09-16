@@ -7,6 +7,8 @@ For further reading:
 - ["Tokenomics" - lol](https://github.com/connorbode/filestoragevm/blob/main/TOKENOMICS.md)
 - ["Data storage / transaction details](https://github.com/connorbode/filestoragevm/blob/main/TRANSACTION.md)
 
+[VIDEO DEMO / me rambling](https://vimeo.com/606041207/a6142b0f0c).
+
 This project currently is only local. I intend to deploy it to Fuji, but of course I forgot to sync the chain and now it's taking forever. Will update with more details if I put it live. 
 
 
