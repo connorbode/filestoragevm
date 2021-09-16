@@ -9,6 +9,29 @@ For further reading:
 
 This project currently is only local. I intend to deploy it to Fuji, but of course I forgot to sync the chain and now it's taking forever. Will update with more details if I put it live. 
 
+
+## Validating on Fuji
+
+1. You'll need to copy the binary out of `/bin` (or compile yourself using the build script) into your `avalanchego/plugins` directory.
+1. Add your node as a validator on the primary subnet
+1. Add your node as a validator on the subnet wtyFZF1UUyjyXeiVCP5Vd5dpQ6KPCmG24qW3agbSRdtVEh7Jb
+
+Then, to validate on Fuji, we need to run avalanchego as follows:
+
+`avalanchego --network-id=fuji --whitelisted-subnets=wtyFZF1UUyjyXeiVCP5Vd5dpQ6KPCmG24qW3agbSRdtVEh7Jb --index-enabled`
+
+Unfortunately `--index-enabled` requires resyncing the whole chain.
+
+
+## Connecting to Fuji
+
+Will provide more info on this once I resync the chain with index-enabled haha.
+
+```
+SUBNET_ID=wtyFZF1UUyjyXeiVCP5Vd5dpQ6KPCmG24qW3agbSRdtVEh7Jb
+BLOCKCHAIN_ID=6XHJC4cJVzSyF4iaA5TugsnWzn3LTY1Y5DwGwaTYYUrWuwQJ7
+```
+
 ## Installation
 
 1. Clone repo

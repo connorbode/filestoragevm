@@ -109,6 +109,15 @@ def wait_for_bootstrap():
 		'9652', 
 		'9654',
 		'9656',
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "platform.createAddress",
+    "params": {
+        "username":"myUsername",
+        "password":"myPassword"
+    },
+    "id": 1
+}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/bc/P
 		'9658',
 	]
 	while True:
