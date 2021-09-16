@@ -1,5 +1,14 @@
 # FilestorageVM
 
+This project was implemented as part of a hackathon. The goal was to create a custom virtual machine / subnet which run on Avalanche. I created a chain which allows users to store arbitrary data (e.g. for files or other things). Validators of the subnet are able to earn rewards for validating.
+
+For further reading:
+
+- ["Tokenomics" - lol](https://github.com/connorbode/filestoragevm/blob/main/TOKENOMICS.md)
+- ["Data storage / transaction details](https://github.com/connorbode/filestoragevm/blob/main/TRANSACTION.md)
+
+This project currently is only local. I intend to deploy it to Fuji, but of course I forgot to sync the chain and now it's taking forever. Will update with more details if I put it live. 
+
 ## Installation
 
 1. Clone repo
@@ -57,4 +66,5 @@ The following environment variables need to be set
 From the `/cli` directory, run `python3 cli.py <blockchain_id>`
 
 [More details on the CLI are available here](https://github.com/connorbode/filestoragevm/blob/main/cli/README.md)
+
 
