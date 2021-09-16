@@ -63,7 +63,8 @@ This is dependent on the message type from layer 3.
 ## Security Issues
 
 - There is no protection against replay attacks. Perhaps this can be remedied by adding a time-based nonce? But I didn't have time to explore.
-- I can probably spend anyone's balance, because I realized in writing this document that the sender of a transaction does not need to match the signer of the message.
+- I can probably spend anyone's balance, because I realized in writing this document that the sender of a transaction does not need to match the signer of the message. This is a simple fix, but I haven't done it just to preserve the state of this repo for the Hackathon. Perhaps I'll implement in the future.
+- Critically, when you "stake", you link a NodeID to a reward address on the system. There is no authentication for the NodeID, because I wasn't aware of how to do this. Apparently we just need a sig from the staking key, and then we can CB58Decode the NodeID to get the public key. So the "staking" transaction should be re-written to authenticate the NodeID to the reward address. I don't think there is any real reason to actually "stake" funds, so this transaction could simply be used to link a NodeID to a reward address, and specify the start / end of the validation period. 
 - Keypair is currently generated on the server. This could be done on the client side, but after I figured out how I ran out of time to implement.
 
 ## Scalability Issues
