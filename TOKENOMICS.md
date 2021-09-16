@@ -17,7 +17,7 @@ Funds flow back into the system account when users upload files.
 
 ## Uploading Data
 
-There is a fixed cost of 1 token per block to upload data. In a real deployment, the cost would likely have to be much more complex.
+There is a fixed cost of 1 token per block to upload data. In a real deployment, the cost of uploading would have to be a function of many different factors to make the economy sustainable.
 
 ## Staking
 
@@ -31,6 +31,8 @@ Rewards are only awarded if:
 
 1. The NodeID was indeed validating the Subnet during the staking period. This is done by checking the P-Chain to verify that, for every 5 minute interval, the NodeID was there and validating.
 1. The reward period is over.
+
+At the moment there is a fixed reward of 1 token per second staked. In a real deployment, the reward would have to be a function of many different factors to make the economy sustainable.
 
 Current problems with staking:
 
